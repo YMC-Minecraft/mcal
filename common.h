@@ -40,33 +40,39 @@ static inline double *val_get_index(struct val *val, int index)
 	switch (val->type)
 	{
 		case VEC3D:
-			struct vec3d *d_v3d = (struct vec3d *)val;
-			switch (index)
 			{
-				case 0: return &d_v3d->x;
-				case 1: return &d_v3d->y;
-				case 2: return &d_v3d->z;
-				default: assert(0);
+				struct vec3d *d_v3d = (struct vec3d *)val;
+				switch (index)
+				{
+					case 0: return &d_v3d->x;
+					case 1: return &d_v3d->y;
+					case 2: return &d_v3d->z;
+					default: assert(0);
+				}
 			}
 		case BOX:
-			struct box *v_box = (struct box *)val;
-			switch (index)
 			{
-				case 0: return &v_box->min_x;
-				case 1: return &v_box->min_y;
-				case 2: return &v_box->min_z;
-				case 3: return &v_box->max_x;
-				case 4: return &v_box->max_y;
-				case 5: return &v_box->max_z;
-				default: assert(0);
+				struct box *v_box = (struct box *)val;
+				switch (index)
+				{
+					case 0: return &v_box->min_x;
+					case 1: return &v_box->min_y;
+					case 2: return &v_box->min_z;
+					case 3: return &v_box->max_x;
+					case 4: return &v_box->max_y;
+					case 5: return &v_box->max_z;
+					default: assert(0);
+				}
 			}
 		case ENTITY_DIMEN:
-			struct entity_dimen *v_dimen = (struct entity_dimen *)val;
-			switch (index)
 			{
-				case 0: return &v_dimen->width;
-				case 1: return &v_dimen->height;
-				default: assert(0);
+				struct entity_dimen *v_dimen = (struct entity_dimen *)val;
+				switch (index)
+				{
+					case 0: return &v_dimen->width;
+					case 1: return &v_dimen->height;
+					default: assert(0);
+				}
 			}
 		default:
 			assert(0);
