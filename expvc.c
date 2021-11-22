@@ -119,12 +119,14 @@ usage:
 			entity.x,
 			entity.y,
 			entity.z);
+	printf("WARNING: Explosion range bounding box is ignored. In reality, if the target entity is too far from the explosion center, it will not be affected. We will support that later.\n");
 	double power2 = 2.0 * power;
 	double xx = entity.x - tnt.x;
 	double zz = entity.z - tnt.z;
 	double yy = (is_tnt ? entity.y : entity_eye_y) - tnt.y;
 	double dist = sqrt(xx * xx + (entity.y - tnt.y) * (entity.y - tnt.y) + zz * zz);
 	printf("Square distance: %.5f\n", dist);
+	printf("WARNING: Explosion immunity is ignored. In reality, if the target entity is immune to explosion, it will not be affected at all.\n");
 	if (dist / power2 > 1)
 	{
 		printf("Not affected, to too far. (Square distance = %.5f).\n", dist);
@@ -145,6 +147,7 @@ usage:
 	printf("Accel: %.5f\n", accel);
 	int damage = (int) ((accel * accel + accel) / 2.0 * 7.0 * power2 + 1.0);
 	printf("Damage: %d\n", damage);
+	printf("WARNING: Explosion protection is ignored. In reality, if the entity has that protection, the final acceleration may be altered.\n");
 	struct vec3d delta_v = {
 		xx * accel,
 		yy * accel,
