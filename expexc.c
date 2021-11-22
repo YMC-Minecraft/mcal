@@ -15,8 +15,15 @@ int main(int argc, char **argv)
 	{
 		goto usage;
 usage:
-		fprintf(stderr, "Usage: %s minX,minY,minZ,maxX,maxY,maxZ (Bounding box of the target entity)\n"
+		fprintf(stderr, "Usage: %s minX,minY,minZ,maxX,maxY,maxZ\n"
 				"\n"
+				"Options:\n"
+				"\t-b bounding box\tEntity bounding box. Position dependent. [Mandatory, or -d]"
+				"\t-d dimension\tUse entity dimension instead of bounding box. Note: output is also position independent.\n"
+				"\t-p vec3d\tOptional argument used with -d. Specify the position of the entity so expexc will show the final position dependent destinations. Same effect with -b alone. [Optional, defaults to 0,0,0]\n"
+				"\n"
+				"Bounding box format: minX,minY,minZ,maxX,maxY,maxZ. No spaces or brackets allowed.\n"
+				"Dimension format: width,height. No spaces or brackets allowed.\n"
 				"Use this tool to simulate the rays to cast for exposure rate calculation.\n"
 				"Whenever an entity is to be affected by an explosion, Minecraft will cast lots of rays from the explosion center to the target entity to see how many of them are blocked. The percentage of successful casts will be used for acceleration and damage calculation (see expvc(1) -x).\n"
 				"\n"
@@ -24,7 +31,61 @@ usage:
 				, argv[0]);
 		return 64;
 	}
-	if (val_parse(argv[1], (struct val *)&bbox)) goto usage;
+	struct vec3d position = { VEC3D, 0.0, 0.0, 0.0 };
+	struct entity_dimen dimen = { ENTITY_DIMEN, 0.0, 0.0 };
+	int arg_supplied = 0;
+	int use_bbox = 1;
+	for (int i = 1; i < argc; i ++)
+	{
+		const char *arg = argv[i];
+		if (!strcmp("-h", arg)) goto usage;
+		if (i == argc - 1)
+		{
+			fprintf(stderr, "%s requires an argument.\n", arg);
+			goto usage;
+		}
+		char *val = argv[++i];
+		if (!strcmp("-b", arg))
+		{
+			if (arg_supplied ++)
+			{
+				fprintf(stderr, "-d is already supplied. It cannot be used in conjunction with -b.\n");
+				goto usage;
+			}
+			if (val_parse(val, (struct val *)&bbox)) goto usage;
+		}
+		else if (!strcmp("-d", arg))
+		{
+			if (arg_supplied ++)
+			{
+				fprintf(stderr, "-b is already supplied. It cannot be used in conjunction with -d.\n");
+				goto usage;
+			}
+			if (val_parse(val, (struct val *)&dimen)) goto usage;
+			use_bbox = 0;
+		}
+		else if (!strcmp("-p", arg)) { if (val_parse(val, (struct val *)&position)) goto usage; }
+		else
+		{
+			fprintf(stderr, "Unknown option %s.\n", arg);
+			goto usage;
+		}
+	}
+	if (!arg_supplied)
+	{
+		fprintf(stderr, "You must supply -b or -d.\n");
+		goto usage;
+	}
+	if (!use_bbox)
+	{
+		double half_width = dimen.width / 2.0;
+		bbox.min_x = position.x -half_width;
+		bbox.min_y = position.y;
+		bbox.min_z = position.z -half_width;
+		bbox.max_x = position.x + half_width;
+		bbox.max_y = position.y + dimen.height;
+		bbox.max_z = position.z + half_width;
+	}
 	fprintf(stderr, "Box(%.2f, %.2f, %.2f -> %.2f, %.2f, %.2f)\n",
 			bbox.min_x,
 			bbox.min_y,

@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <math.h>
 
-enum val_type { VEC3D, BOX };
+enum val_type { VEC3D, BOX, ENTITY_DIMEN };
 
 struct val {
 	enum val_type type;
@@ -27,6 +27,12 @@ struct box {
 	double max_x;
 	double max_y;
 	double max_z;
+};
+
+struct entity_dimen {
+	enum val_type type;
+	double width;
+	double height;
 };
 
 static inline double *val_get_index(struct val *val, int index)
@@ -54,6 +60,14 @@ static inline double *val_get_index(struct val *val, int index)
 				case 5: return &v_box->max_z;
 				default: assert(0);
 			}
+		case ENTITY_DIMEN:
+			struct entity_dimen *v_dimen = (struct entity_dimen *)val;
+			switch (index)
+			{
+				case 0: return &v_dimen->width;
+				case 1: return &v_dimen->height;
+				default: assert(0);
+			}
 		default:
 			assert(0);
 	}
@@ -71,6 +85,9 @@ static int val_parse(char *in, struct val *o)
 			break;
 		case BOX:
 			required_vars = 6;
+			break;
+		case ENTITY_DIMEN:
+			required_vars = 2;
 			break;
 	}
 	while (p != NULL)
