@@ -110,7 +110,7 @@ usage:
 			goto usage;
 		}
 	}
-	printf("(%.5f, %.5f, %.5f) -> %.2f -> %c(%.5f, %.5f, %.5f)\n",
+	fprintf(stderr, "(%.5f, %.5f, %.5f) -> %.2f -> %c(%.5f, %.5f, %.5f)\n",
 			tnt.x,
 			tnt.y,
 			tnt.z,
@@ -119,44 +119,44 @@ usage:
 			entity.x,
 			entity.y,
 			entity.z);
-	printf("WARNING: Explosion range bounding box is ignored. In reality, if the target entity is too far from the explosion center, it will not be affected. We will support that later.\n");
+	fprintf(stderr, "WARNING: Explosion range bounding box is ignored. In reality, if the target entity is too far from the explosion center, it will not be affected. We will support that later.\n");
 	double power2 = 2.0 * power;
 	double xx = entity.x - tnt.x;
 	double zz = entity.z - tnt.z;
 	double yy = (is_tnt ? entity.y : entity_eye_y) - tnt.y;
 	double dist = sqrt(xx * xx + (entity.y - tnt.y) * (entity.y - tnt.y) + zz * zz);
-	printf("Square distance: %.5f\n", dist);
-	printf("WARNING: Explosion immunity is ignored. In reality, if the target entity is immune to explosion, it will not be affected at all.\n");
+	fprintf(stderr, "Square distance: %.5f\n", dist);
+	fprintf(stderr, "WARNING: Explosion immunity is ignored. In reality, if the target entity is immune to explosion, it will not be affected at all.\n");
 	if (dist / power2 > 1)
 	{
 		printf("Not affected, to too far. (Square distance = %.5f).\n", dist);
-		return 0;
+		return 1;
 	}
-	printf("Delta distance: %.5f, %.5f, %.5f\n", xx, yy, zz);
+	fprintf(stderr, "Delta distance: %.5f, %.5f, %.5f\n", xx, yy, zz);
 	double dist_eye_y = sqrt(xx * xx + yy * yy + zz * zz);
 	if (dist_eye_y == 0)
 	{
 		printf("Not affected due to dist_eye_y == 0.\n");
-		return 0;
+		return 1;
 	}
 	xx /= dist_eye_y;
 	yy /= dist_eye_y;
 	zz /= dist_eye_y;
-	printf("Delta distance final: %.5f, %.5f, %.5f\n", xx, yy, zz);
+	fprintf(stderr, "Delta distance final: %.5f, %.5f, %.5f\n", xx, yy, zz);
 	double accel = (1.0 - (dist / power2)) * exposure;
-	printf("Accel: %.5f\n", accel);
+	printf("ACCELERATION=%.5f\n", accel);
 	int damage = (int) ((accel * accel + accel) / 2.0 * 7.0 * power2 + 1.0);
-	printf("Damage: %d\n", damage);
-	printf("WARNING: Explosion protection is ignored. In reality, if the entity has that protection, the final acceleration may be altered.\n");
+	printf("DAMAGE=%d\n", damage);
+	fprintf(stderr, "WARNING: Explosion protection is ignored. In reality, if the entity has that protection, the final acceleration may be altered.\n");
 	struct vec3d delta_v = {
 		xx * accel,
 		yy * accel,
 		zz * accel
 	};
-	printf("Delta velocity: (%.5f, %.5f, %.5f)\n", delta_v.x, delta_v.y, delta_v.z);
+	printf("DELTA_VELOCITY=\"%.5f,%.5f,%.5f\"\n", delta_v.x, delta_v.y, delta_v.z);
 	velocity.x += delta_v.x;
 	velocity.y += delta_v.y;
 	velocity.z += delta_v.z;
-	printf("Final velocity: (%.5f, %.5f, %.5f)\n", velocity.x, velocity.y, velocity.z);
+	printf("FINAL_VELOCITY=\"%.5f,%.5f,%.5f\"\n", velocity.x, velocity.y, velocity.z);
 	return 0;
 }
