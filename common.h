@@ -80,7 +80,7 @@ static int val_parse(char *in, struct val *o)
 	}
 	if (i != required_vars)
 	{
-		fprintf(stderr, "Invalid Vec3D: %s. Example: -1,1,1.\n", in);
+		fprintf(stderr, "Invalid value: %s.\n", in);
 		return 64;
 	}
 	return 0;
