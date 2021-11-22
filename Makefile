@@ -1,4 +1,5 @@
 .POSIX:
+CFLAGS += -I.
 CFLAGS += -std=c99
 CFLAGS += -Wall
 LDLIBS += -lm
