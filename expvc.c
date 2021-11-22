@@ -8,9 +8,9 @@
 
 int main(int argc, char **argv)
 {
-	struct vec3d tnt = { 0.0, 0.0, 0.0 };
-	struct vec3d entity = { 0.0, 0.0, 0.0 };
-	struct vec3d velocity = { 0.0, 0.0, 0.0 };
+	struct vec3d tnt = { VEC3D, 0.0, 0.0, 0.0 };
+	struct vec3d entity = { VEC3D, 0.0, 0.0, 0.0 };
+	struct vec3d velocity = { VEC3D, 0.0, 0.0, 0.0 };
 	double entity_eye_y = 0.0;
 	int is_tnt = 1;
 	double power = 4.0;
@@ -44,9 +44,9 @@ usage:
 			goto usage;
 		}
 		char *val = argv[++i];
-		if (!strcmp("-t", arg)) { if ((r = vec3d_parse(val, &tnt))) return r; }
-		else if (!strcmp("-e", arg)) { if ((r = vec3d_parse(val, &entity))) return r; }
-		else if (!strcmp("-v", arg)) { if ((r = vec3d_parse(val, &velocity))) return r; }
+		if (!strcmp("-t", arg)) { if ((r = val_parse(val, (struct val *)&tnt))) return r; }
+		else if (!strcmp("-e", arg)) { if ((r = val_parse(val, (struct val *)&entity))) return r; }
+		else if (!strcmp("-v", arg)) { if ((r = val_parse(val, (struct val *)&velocity))) return r; }
 		else if (!strcmp("-ey", arg))
 		{
 			sscanf(val, "%lf", &entity_eye_y);
@@ -107,6 +107,7 @@ usage:
 	printf("DAMAGE=%d\n", damage);
 	fprintf(stderr, "WARNING: Explosion protection is ignored. In reality, if the entity has that protection, the final acceleration may be altered.\n");
 	struct vec3d delta_v = {
+		VEC3D,
 		xx * accel,
 		yy * accel,
 		zz * accel
