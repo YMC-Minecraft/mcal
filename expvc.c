@@ -12,6 +12,7 @@ int main(int argc, char **argv)
 	struct vec3d entity = { VEC3D, 0.0, 0.0, 0.0 };
 	struct vec3d velocity = { VEC3D, 0.0, 0.0, 0.0 };
 	double entity_eye_y = 0.0;
+	double entity_eye_height = 0.0;
 	int is_tnt = 1;
 	double power = 4.0;
 	double exposure = 1.0;
@@ -25,7 +26,8 @@ usage:
 				"\t-t  vec3d\tTNT entity coords [Mandatory]\n"
 				"\t-e  vec3d\tTarget entity coords [Mandatory]\n"
 				"\t-p  double\tExplosion power [Optional, defaults to 4.0 (TNT)]\n"
-				"\t-ey vec3d\tTarget entity eye Y [Optional if the target is a TNT]\n"
+				"\t-ey vec3d\tTarget entity eye Y (= Y pos + eye height) [Optional if the target is a TNT] [-ey = -eh]\n"
+				"\t-eh double\tInstead of using -ey, specify eye height and calculate eye Y [Optional if the target is a TNT] [-ey = -eh]\n"
 				"\t-v  vec3d\tTarget entity initial velocity [Optional, defaults to 0,0,0]\n"
 				"\t-x  double\tExposure of explosion. Percentage. 1.0 if no blocks blocking the ray. [Optional, defaults to 1.0]\n"
 				"\t-h\t\tPrint usage to stderr\n"
@@ -49,7 +51,27 @@ usage:
 		else if (!strcmp("-v", arg)) { if ((r = val_parse(val, (struct val *)&velocity))) return r; }
 		else if (!strcmp("-ey", arg))
 		{
+			if (!is_tnt)
+			{
+				fprintf(stderr, "-ey cannot be used in conjunction with -eh, or specified multiple times.\n");
+				goto usage;
+			}
 			sscanf(val, "%lf", &entity_eye_y);
+			is_tnt = 0;
+		}
+		else if (!strcmp("-eh", arg))
+		{
+			if (!is_tnt)
+			{
+				fprintf(stderr, "-eh cannot be used in conjunction with -ey, or specified multiple times.\n");
+				goto usage;
+			}
+			sscanf(val, "%lf", &entity_eye_height);
+			if (entity_eye_height <= 0.0)
+			{
+				fprintf(stderr, "-ey only accepts > 0.0 numbers.\n");
+				goto usage;
+			}
 			is_tnt = 0;
 		}
 		else if (!strcmp("-p", arg)) sscanf(val, "%lf", &power);
@@ -67,6 +89,11 @@ usage:
 			fprintf(stderr, "Unknown argument: %s\n", arg);
 			goto usage;
 		}
+	}
+	if (entity_eye_height > 0.0)
+	{
+		entity_eye_y = entity.y + entity_eye_height;
+		fprintf(stderr, "Calculated eye Y: %.5f + %.5f = %.5f\n", entity.y, entity_eye_height, entity_eye_y);
 	}
 	fprintf(stderr, "(%.5f, %.5f, %.5f) -> %.2f -> %c(%.5f, %.5f, %.5f)\n",
 			tnt.x,
