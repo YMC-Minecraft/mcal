@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 	int is_tnt = 1;
 	double power = 4.0;
 	double exposure = 1.0;
+	int blast_prot = 0;
 	if (argc <= 1)
 	{
 		goto usage;
@@ -30,6 +31,7 @@ usage:
 				"\t-eh double\tInstead of using -ey, specify eye height and calculate eye Y [Optional if the target is a TNT] [-ey = -eh]\n"
 				"\t-v  vec3d\tTarget entity initial velocity [Optional, defaults to 0,0,0]\n"
 				"\t-x  double\tExposure of explosion. Percentage. 1.0 if no blocks blocking the ray. [Optional, defaults to 1.0]\n"
+				"\t-b  int\tTarget entity blast protection level [Optional]\n"
 				"\t-h\t\tPrint usage to stderr\n"
 				"\n"
 				"Vec3D Format: x,y,z. No spaces or brackets allowed.\n", argv[0]);
@@ -84,6 +86,7 @@ usage:
 				goto usage;
 			}
 		}
+		else if (!strcmp("-b", arg)) sscanf(val, "%d", &blast_prot);
 		else
 		{
 			fprintf(stderr, "Unknown argument: %s\n", arg);
@@ -129,10 +132,14 @@ usage:
 	zz /= dist_eye_y;
 	fprintf(stderr, "Delta distance final: %.5f, %.5f, %.5f\n", xx, yy, zz);
 	double accel = (1.0 - (dist / power2)) * exposure;
+	if (blast_prot > 0)
+	{
+		fprintf(stderr, "Applying blact protection level of %d.\n", blast_prot);
+		accel -= floor(accel * (double)((float)blast_prot * 0.15f));
+	}
 	printf("ACCELERATION=%.5f\n", accel);
 	int damage = (int) ((accel * accel + accel) / 2.0 * 7.0 * power2 + 1.0);
 	printf("DAMAGE=%d\n", damage);
-	fprintf(stderr, "WARNING: Explosion protection is ignored. In reality, if the entity has that protection, the final acceleration may be altered.\n");
 	struct vec3d delta_v = {
 		VEC3D,
 		xx * accel,
