@@ -17,6 +17,7 @@ int main(int argc, char **argv)
 	double power = 4.0;
 	double exposure = 1.0;
 	int blast_prot = 0;
+	int number = 1;
 	if (argc <= 1)
 	{
 		goto usage;
@@ -32,6 +33,7 @@ usage:
 				"\t-v  vec3d\tTarget entity initial velocity [Optional, defaults to 0,0,0]\n"
 				"\t-x  double\tExposure of explosion. Percentage. 1.0 if no blocks blocking the ray. [Optional, defaults to 1.0]\n"
 				"\t-b  int\tTarget entity blast protection level [Optional]\n"
+				"\t-n  int\tSimulate multiple explosions (at the same pos) in the same tick, and output the final velocity to the target entity [Optional, defaults to 1]\n"
 				"\t-h\t\tPrint usage to stderr\n"
 				"\n"
 				"Vec3D Format: x,y,z. No spaces or brackets allowed.\n", argv[0]);
@@ -87,6 +89,16 @@ usage:
 			}
 		}
 		else if (!strcmp("-b", arg)) sscanf(val, "%d", &blast_prot);
+		else if (!strcmp("-n", arg))
+		{
+			sscanf(val, "%d", &number);
+			if (number < 1)
+			{
+				fprintf(stderr, "Invalid number of explosions: %d. Must be >= 1.\n",
+						number);
+				goto usage;
+			}
+		}
 		else
 		{
 			fprintf(stderr, "Unknown argument: %s\n", arg);
@@ -98,10 +110,11 @@ usage:
 		entity_eye_y = entity.y + entity_eye_height;
 		fprintf(stderr, "Calculated eye Y: %.5f + %.5f = %.5f\n", entity.y, entity_eye_height, entity_eye_y);
 	}
-	fprintf(stderr, "(%.5f, %.5f, %.5f) -> %.2f -> %c(%.5f, %.5f, %.5f)\n",
+	fprintf(stderr, "(%.5f, %.5f, %.5f) -> %d x %.2f -> %c(%.5f, %.5f, %.5f)\n",
 			tnt.x,
 			tnt.y,
 			tnt.z,
+			number,
 			power,
 			is_tnt ? 'T' : 'E',
 			entity.x,
@@ -138,13 +151,13 @@ usage:
 		accel -= floor(accel * (double)((float)blast_prot * 0.15f));
 	}
 	printf("ACCELERATION=%.5f\n", accel);
-	int damage = (int) ((accel * accel + accel) / 2.0 * 7.0 * power2 + 1.0);
+	int damage = number * ((int) ((accel * accel + accel) / 2.0 * 7.0 * power2 + 1.0));
 	printf("DAMAGE=%d\n", damage);
 	struct vec3d delta_v = {
 		VEC3D,
-		xx * accel,
-		yy * accel,
-		zz * accel
+		number * xx * accel,
+		number * yy * accel,
+		number * zz * accel
 	};
 	printf("DELTA_VELOCITY=\"%.5f,%.5f,%.5f\"\n", delta_v.x, delta_v.y, delta_v.z);
 	velocity.x += delta_v.x;
