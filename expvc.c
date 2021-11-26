@@ -143,7 +143,7 @@ usage:
 	xx /= dist_eye_y;
 	yy /= dist_eye_y;
 	zz /= dist_eye_y;
-	fprintf(stderr, "Delta distance final: %.5f, %.5f, %.5f\n", xx, yy, zz);
+	fprintf(stderr, "Delta distance normalized: %.5f, %.5f, %.5f\n", xx, yy, zz);
 	double accel = (1.0 - (dist / power2)) * exposure;
 	if (blast_prot > 0)
 	{
