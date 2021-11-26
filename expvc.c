@@ -32,8 +32,8 @@ usage:
 				"\t-eh double\tInstead of using -ey, specify eye height and calculate eye Y [Optional if the target is a TNT] [-ey = -eh]\n"
 				"\t-v  vec3d\tTarget entity initial velocity [Optional, defaults to 0,0,0]\n"
 				"\t-x  double\tExposure of explosion. Percentage. 1.0 if no blocks blocking the ray. [Optional, defaults to 1.0]\n"
-				"\t-b  int\tTarget entity blast protection level [Optional]\n"
-				"\t-n  int\tSimulate multiple explosions (at the same pos) in the same tick, and output the final velocity to the target entity [Optional, defaults to 1]\n"
+				"\t-b  int\t\tTarget entity blast protection level [Optional]\n"
+				"\t-n  int\t\tSimulate multiple explosions (at the same pos) in the same tick, and output the final velocity to the target entity [Optional, defaults to 1]\n"
 				"\t-h\t\tPrint usage to stderr\n"
 				"\n"
 				"Vec3D Format: x,y,z. No spaces or brackets allowed.\n", argv[0]);
